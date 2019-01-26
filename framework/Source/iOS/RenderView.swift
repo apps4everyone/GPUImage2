@@ -49,33 +49,37 @@ public class RenderView:UIView, ImageConsumer {
     }
     
     func createDisplayFramebuffer() {
-        var newDisplayFramebuffer:GLuint = 0
-        glGenFramebuffers(1, &newDisplayFramebuffer)
-        displayFramebuffer = newDisplayFramebuffer
-        glBindFramebuffer(GLenum(GL_FRAMEBUFFER), displayFramebuffer!)
-
-        var newDisplayRenderbuffer:GLuint = 0
-        glGenRenderbuffers(1, &newDisplayRenderbuffer)
-        displayRenderbuffer = newDisplayRenderbuffer
-        glBindRenderbuffer(GLenum(GL_RENDERBUFFER), displayRenderbuffer!)
-
-        sharedImageProcessingContext.context.renderbufferStorage(Int(GL_RENDERBUFFER), from:self.layer as! CAEAGLLayer)
-
-        var backingWidth:GLint = 0
-        var backingHeight:GLint = 0
-        glGetRenderbufferParameteriv(GLenum(GL_RENDERBUFFER), GLenum(GL_RENDERBUFFER_WIDTH), &backingWidth)
-        glGetRenderbufferParameteriv(GLenum(GL_RENDERBUFFER), GLenum(GL_RENDERBUFFER_HEIGHT), &backingHeight)
-        backingSize = GLSize(width:backingWidth, height:backingHeight)
         
-        guard ((backingWidth > 0) && (backingHeight > 0)) else {
-            fatalError("View had a zero size")
-        }
-
-        glFramebufferRenderbuffer(GLenum(GL_FRAMEBUFFER), GLenum(GL_COLOR_ATTACHMENT0), GLenum(GL_RENDERBUFFER), displayRenderbuffer!)
-        
-        let status = glCheckFramebufferStatus(GLenum(GL_FRAMEBUFFER))
-        if (status != GLenum(GL_FRAMEBUFFER_COMPLETE)) {
-            fatalError("Display framebuffer creation failed with error: \(FramebufferCreationError(errorCode:status))")
+        DispatchQueue.main.async {
+            
+            var newDisplayFramebuffer:GLuint = 0
+            glGenFramebuffers(1, &newDisplayFramebuffer)
+            displayFramebuffer = newDisplayFramebuffer
+            glBindFramebuffer(GLenum(GL_FRAMEBUFFER), displayFramebuffer!)
+            
+            var newDisplayRenderbuffer:GLuint = 0
+            glGenRenderbuffers(1, &newDisplayRenderbuffer)
+            displayRenderbuffer = newDisplayRenderbuffer
+            glBindRenderbuffer(GLenum(GL_RENDERBUFFER), displayRenderbuffer!)
+            
+            sharedImageProcessingContext.context.renderbufferStorage(Int(GL_RENDERBUFFER), from:self.layer as! CAEAGLLayer)
+            
+            var backingWidth:GLint = 0
+            var backingHeight:GLint = 0
+            glGetRenderbufferParameteriv(GLenum(GL_RENDERBUFFER), GLenum(GL_RENDERBUFFER_WIDTH), &backingWidth)
+            glGetRenderbufferParameteriv(GLenum(GL_RENDERBUFFER), GLenum(GL_RENDERBUFFER_HEIGHT), &backingHeight)
+            backingSize = GLSize(width:backingWidth, height:backingHeight)
+            
+            guard ((backingWidth > 0) && (backingHeight > 0)) else {
+                fatalError("View had a zero size")
+            }
+            
+            glFramebufferRenderbuffer(GLenum(GL_FRAMEBUFFER), GLenum(GL_COLOR_ATTACHMENT0), GLenum(GL_RENDERBUFFER), displayRenderbuffer!)
+            
+            let status = glCheckFramebufferStatus(GLenum(GL_FRAMEBUFFER))
+            if (status != GLenum(GL_FRAMEBUFFER_COMPLETE)) {
+                fatalError("Display framebuffer creation failed with error: \(FramebufferCreationError(errorCode:status))")
+            }
         }
     }
     
