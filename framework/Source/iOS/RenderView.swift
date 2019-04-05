@@ -54,13 +54,13 @@ public class RenderView:UIView, ImageConsumer {
             
             var newDisplayFramebuffer:GLuint = 0
             glGenFramebuffers(1, &newDisplayFramebuffer)
-            displayFramebuffer = newDisplayFramebuffer
-            glBindFramebuffer(GLenum(GL_FRAMEBUFFER), displayFramebuffer!)
+            self.displayFramebuffer = newDisplayFramebuffer
+            glBindFramebuffer(GLenum(GL_FRAMEBUFFER), self.displayFramebuffer!)
             
             var newDisplayRenderbuffer:GLuint = 0
             glGenRenderbuffers(1, &newDisplayRenderbuffer)
-            displayRenderbuffer = newDisplayRenderbuffer
-            glBindRenderbuffer(GLenum(GL_RENDERBUFFER), displayRenderbuffer!)
+            self.displayRenderbuffer = newDisplayRenderbuffer
+            glBindRenderbuffer(GLenum(GL_RENDERBUFFER), self.displayRenderbuffer!)
             
             sharedImageProcessingContext.context.renderbufferStorage(Int(GL_RENDERBUFFER), from:self.layer as! CAEAGLLayer)
             
@@ -68,13 +68,13 @@ public class RenderView:UIView, ImageConsumer {
             var backingHeight:GLint = 0
             glGetRenderbufferParameteriv(GLenum(GL_RENDERBUFFER), GLenum(GL_RENDERBUFFER_WIDTH), &backingWidth)
             glGetRenderbufferParameteriv(GLenum(GL_RENDERBUFFER), GLenum(GL_RENDERBUFFER_HEIGHT), &backingHeight)
-            backingSize = GLSize(width:backingWidth, height:backingHeight)
+            self.backingSize = GLSize(width:backingWidth, height:backingHeight)
             
             guard ((backingWidth > 0) && (backingHeight > 0)) else {
                 fatalError("View had a zero size")
             }
             
-            glFramebufferRenderbuffer(GLenum(GL_FRAMEBUFFER), GLenum(GL_COLOR_ATTACHMENT0), GLenum(GL_RENDERBUFFER), displayRenderbuffer!)
+            glFramebufferRenderbuffer(GLenum(GL_FRAMEBUFFER), GLenum(GL_COLOR_ATTACHMENT0), GLenum(GL_RENDERBUFFER), self.displayRenderbuffer!)
             
             let status = glCheckFramebufferStatus(GLenum(GL_FRAMEBUFFER))
             if (status != GLenum(GL_FRAMEBUFFER_COMPLETE)) {
